@@ -90,12 +90,14 @@ def display_scroll_to_top():
     st.markdown(f'<a href="#top" class="end-page-btn" title="Remonter au début"><img src="{LOGOS["arrow_up"]}" class="icon-filter" width="30"></a>', unsafe_allow_html=True)
 
 # --- CSS AVANCÉ (Incluant le split-screen à 30° et les filtres de température) ---
+# --- CSS AVANCÉ (Optimisé pour la performance et le mobile) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@500;700&display=swap');
     
     html, body, [data-testid="stAppViewContainer"] { scroll-behavior: smooth !important; }
 
+    /* Animation du fond : On la garde pour PC, mais on va la désactiver sur mobile pour économiser la batterie */
     @keyframes gradientBackground {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -119,72 +121,18 @@ st.markdown("""
         animation: slideInFromRight 1.2s ease-out; text-align: center; margin-bottom: 20px;
     }
 
-    /* --- CSS DU HERO SPLIT-SCREEN 30 DEGRES --- */
-    .hero-container {
-        position: relative; width: 100%; height: 500px; /* Hauteur augmentée pour mieux remplir la page */
-        border-radius: 20px; overflow: hidden; margin-bottom: 40px;
-        border: 2px solid rgba(0, 212, 255, 0.3);
-        box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
-    }
-    .split-right {
-        /* Image de la Terre à droite */
-        position: absolute; width: 100%; height: 100%;
-        background-size: cover; background-position: right center;
-        z-index: 1;
-    }
-    .split-left {
-        /* Exoplanète avec atmosphère à gauche */
-        position: absolute; width: 100%; height: 100%;
-        background-size: cover; background-position: left center;
-        /* Le polygone calcule l'angle exact de 30° pour une hauteur de 500px (tan(30)*500/2 ≈ 144px) */
-        clip-path: polygon(0 0, calc(50% + 144px) 0, calc(50% - 144px) 100%, 0 100%);
-        z-index: 2;
-    }
-    .split-line {
-        /* Ligne de séparation lumineuse inclinée à 30° */
-        position: absolute; width: 6px; height: 150%;
-        background-color: #00d4ff;
-        top: -25%; left: calc(50% - 3px);
-        transform: rotate(30deg);
-        z-index: 3;
-        box-shadow: 0 0 20px #00d4ff, 0 0 40px #00d4ff;
-    }
-    
-    /* Style interactif des rubriques de l'accueil */
-    .rubrique-card {
-        padding: 40px; 
-        background: rgba(0, 0, 0, 0.4);
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        border-radius: 18px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: all 0.3s ease-in-out;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    }
-    .rubrique-card:hover {
-        transform: scale(1.03);
-        border-color: #00d4ff;
-        box-shadow: 0 0 28px rgba(0, 212, 255, 0.45), 0 4px 24px rgba(0,0,0,0.4);
-        background: rgba(0, 0, 0, 0.6);
-    }
-            
-    /* --- FILTRES DE TEMPÉRATURE --- */
-    .split-left::after {
-        /* Côté gauche : teinte légèrement froide */
-        content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(to right, rgba(0, 0, 255, 0.1), rgba(0, 0, 255, 0.2));
-        z-index: 1; pointer-events: none;
-    }
-    .split-right::after {
-        /* Côté droit : teinte légèrement chaude */
-        content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(to right, rgba(255, 165, 0, 0.2), rgba(255, 165, 0, 0.1));
-        z-index: 4; pointer-events: none;
+    /* Désactivation de l'animation lourde sur mobile */
+    @media (max-width: 768px) {
+        .stApp {
+            animation: none !important;
+            background-position: 50% 50% !important;
+        }
+        .animated-title {
+            font-size: 2em; /* Titre un peu plus petit sur mobile */
+        }
     }
 
-    /* --- BOÎTES DE DÉTAIL ONGLETS (RESTUCTURÉS POUR LE TP) --- */
+    /* --- BOÎTES DE DÉTAIL ONGLETS --- */
     .stTabs [data-baseweb="tab"] {
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         background-color: rgba(22, 27, 34, 0.5); 
@@ -218,18 +166,19 @@ st.markdown("""
     .icon-filter { filter: invert(65%) sepia(87%) saturate(2331%) hue-rotate(154deg) brightness(101%) contrast(104%); }
     .stPlotlyChart { background-color: transparent !important; }
     
-    /* --- STYLE DE LA SIDEBAR (Transparence et Verre dépoli) --- */
+    /* --- STYLE DE LA SIDEBAR --- */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 8, 20, 0.4) !important; 
         backdrop-filter: blur(10px) !important; 
         -webkit-backdrop-filter: blur(10px) !important; 
         border-right: 1px solid rgba(0, 212, 255, 0.2) !important; 
     }
+    [data-testid="stSidebarHeader"] { background-color: transparent !important; }
 
-    [data-testid="stSidebarHeader"] {
-        background-color: transparent !important;
+    /* Réduit le padding vertical Streamlit pour que la page d'accueil tienne sans scroll */
+    [data-testid="stAppViewContainer"] > section > div:first-child {
+        padding-top: 1rem !important;
     }
-            
     </style>
     <div id="top"></div>
 """, unsafe_allow_html=True)
@@ -238,19 +187,6 @@ st.markdown("""
 # Remplace par les vrais noms de tes fichiers dans le dossier data
 img_kepler_b64 = get_base64_image("data/Earth.png") 
 img_terre_b64 = get_base64_image("data/Trappist-1e.png")
-
-# On utilise un f-string (f""") ici pour insérer les variables, 
-# c'est pour ça qu'on le sépare du gros bloc CSS pour éviter les erreurs d'accolades.
-st.markdown(f"""
-    <style>
-    .split-left {{
-        background-image: url("data:image/jpeg;base64,{img_kepler_b64}");
-    }}
-    .split-right {{
-        background-image: url("data:image/jpeg;base64,{img_terre_b64}");
-    }}
-    </style>
-""", unsafe_allow_html=True)
 
 # --- CHARGEMENT DES DONNÉES ---
 @st.cache_data
@@ -264,23 +200,31 @@ def load_data():
 
 df_global = load_data()
 
+# --- SIDEBAR : uniquement sur la page Analyse ---
+if st.session_state.etape_actuelle != "Analyse":
+    # Cache complètement la sidebar sur Accueil et Saisie
+    st.markdown("""
+        <style>
+        [data-testid="stSidebar"] { display: none !important; }
+        [data-testid="collapsedControl"] { display: none !important; }
+        </style>
+    """, unsafe_allow_html=True)
+
 
 # =====================================================================
 # ÉTAPE 1 : PAGE D'ACCUEIL
 # =====================================================================
 if st.session_state.etape_actuelle == "Accueil":
-    st.markdown('<div class="animated-title">🔭 ASTRODATA EXPLORER</div>', unsafe_allow_html=True)
-    
-    # Image SPLIT SCREEN 30 DEGRES
+    # Titre principal — margin-top réduit pour rester dans le viewport
+    st.markdown('<div class="animated-title" style="margin-top: 2vh; margin-bottom: 8px;">🔭 ASTRODATA EXPLORER</div>', unsafe_allow_html=True)
+
     st.markdown("""
-        <div class="hero-container">
-            <div class="split-right"></div>
-            <div class="split-left"></div>
-            <div class="split-line"></div>
-        </div>
+        <p style='text-align: center; color: #b0b8c8; font-size: 1.1em; font-family: "Inter", sans-serif; margin-bottom: 2vh; font-weight: 400; padding: 0 15px;'>
+            Bienvenue dans votre centre de commande planétaire. Plongez dans les véritables archives de l'univers connu, ou entrez dans le laboratoire pour forger vos propres mondes.
+        </p>
     """, unsafe_allow_html=True)
 
-    # Boutons Streamlit réels cachés - cliqués par le JS via leur clé unique dans le DOM
+    # Boutons Streamlit réels cachés
     col1, col2 = st.columns(2)
     with col1:
         btn_nasa = st.button("nasa_hidden", key="btn_nasa_real")
@@ -293,14 +237,14 @@ if st.session_state.etape_actuelle == "Accueil":
         changer_etape("Saisie", "Simulation")
         st.rerun()
 
-    # Cache les boutons Streamlit réels visuellement
     st.markdown("""
         <style>
         div[data-testid="stHorizontalBlock"] { display: none !important; }
+        /* Supprime tout padding Streamlit autour du composant iframe */
+        div[data-testid="stCustomComponentV1"] > iframe { display: block; }
         </style>
     """, unsafe_allow_html=True)
 
-    # --- CARTES + OVERLAY via st.components.v1.html ---
     import streamlit.components.v1 as components
     components.html(f"""
 <!DOCTYPE html>
@@ -308,23 +252,24 @@ if st.session_state.etape_actuelle == "Accueil":
 <head>
 <style>
   * {{ margin:0; padding:0; box-sizing:border-box; }}
-  body {{ background:transparent; font-family:'Inter',sans-serif; }}
+  html, body {{ background:transparent; font-family:'Inter',sans-serif; overflow:hidden; }}
 
   .cards-wrapper {{
     display: flex;
+    flex-direction: row;
     gap: 24px;
-    padding: 4px 2px 12px 2px;
+    padding: 4px 2px 8px 2px;
   }}
 
   .rubrique-card {{
     flex: 1;
-    padding: 36px 32px;
+    padding: 30px 28px;
     background: rgba(0,0,0,0.4);
     border: 1.5px solid rgba(255,255,255,0.25);
     border-radius: 18px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.3);
     transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
     cursor: default;
@@ -339,29 +284,27 @@ if st.session_state.etape_actuelle == "Accueil":
     box-shadow: 0 0 28px rgba(193,68,14,0.55);
     background: rgba(0,0,0,0.6);
   }}
-
   .rubrique-card h3 {{
     color: #e0e0e0;
     font-family: 'Orbitron', 'Inter', sans-serif;
-    font-size: 1.15em;
+    font-size: 1.1em;
     font-weight: 700;
   }}
   .rubrique-card p {{
     color: #b0b8c8;
-    font-size: 0.95em;
+    font-size: 0.92em;
     line-height: 1.5;
   }}
-
   .card-btn {{
     display: block;
     width: 60%;
-    margin: 8px auto 0 auto;
-    padding: 11px 0;
+    margin: 6px auto 0 auto;
+    padding: 10px 0;
     background: #00d4ff;
     color: #000;
     font-weight: bold;
     font-family: 'Orbitron', 'Inter', sans-serif;
-    font-size: 0.88em;
+    font-size: 0.85em;
     border: none;
     border-radius: 10px;
     cursor: pointer;
@@ -372,36 +315,75 @@ if st.session_state.etape_actuelle == "Accueil":
     box-shadow: 0 0 18px rgba(0,212,255,0.7);
     background: #33ddff;
   }}
+
+  /* ── MOBILE : empilement vertical ── */
+  @media (max-width: 768px) {{
+    html, body {{ overflow-y: auto !important; }}  /* scroll autorisé sur mobile */
+    .cards-wrapper {{
+      flex-direction: column;
+      gap: 16px;
+    }}
+    .rubrique-card {{
+      padding: 20px 16px;
+      gap: 8px;
+    }}
+    .rubrique-card h3 {{ font-size: 1em; }}
+    .rubrique-card p  {{ font-size: 0.85em; }}
+    .rubrique-card img {{ width: 80px !important; }}
+    .card-btn {{
+      width: 80%;
+      padding: 12px 0;
+      font-size: 0.82em;
+    }}
+  }}
 </style>
 </head>
 <body>
 
-<div class="cards-wrapper">
-
-  <!-- CARTE NASA -->
+<div class="cards-wrapper" id="cards">
   <div class="rubrique-card"
        onmouseenter="showBg('nasa')"
        onmouseleave="hideBg()">
     <img src="https://www.nasa.gov/wp-content/uploads/2023/03/nasa-logo-web-rgb.png"
-         width="110" style="display:block;"/>
+         width="110" style="display:block;" loading="lazy"/>
     <h3>Base R&eacute;elle NASA</h3>
     <p>Analysez les v&eacute;ritables exoplan&egrave;tes d&eacute;couvertes par nos t&eacute;lescopes (Missions Kepler et TESS).</p>
     <button class="card-btn" onclick="navigate('nasa')">Lancer l&rsquo;exploration</button>
   </div>
 
-  <!-- CARTE SIMULATION -->
   <div class="rubrique-card card-simu"
        onmouseenter="showBg('simu')"
        onmouseleave="hideBg()">
-    <div style="font-size:2.8em;">&#129680;</div>
+    <div style="font-size:2.6em;">&#129680;</div>
     <h3>Laboratoire (Simulation)</h3>
     <p>Partez d&rsquo;un &eacute;chantillon r&eacute;duit, cr&eacute;ez vos propres plan&egrave;tes et pi&eacute;gez l&rsquo;IA.</p>
     <button class="card-btn" onclick="navigate('simu')">Cr&eacute;er des mondes</button>
   </div>
-
 </div>
 
 <script>
+  /* ── Redimensionnement automatique de l'iframe ──
+     Double approche : postMessage pour Streamlit + frameElement direct */
+  function sendHeight() {{
+    var h = document.getElementById('cards').scrollHeight + 8;
+    /* Méthode 1 : postMessage Streamlit */
+    window.parent.postMessage({{type:'streamlit:setFrameHeight', height: h}}, '*');
+    /* Méthode 2 : accès direct à l'élément iframe */
+    try {{
+      if (window.frameElement) window.frameElement.style.height = h + 'px';
+    }} catch(e) {{}}
+  }}
+  document.addEventListener('DOMContentLoaded', function() {{
+    sendHeight();
+    setTimeout(sendHeight, 100);
+    setTimeout(sendHeight, 400);
+  }});
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+  if (window.ResizeObserver) {{
+    new ResizeObserver(sendHeight).observe(document.getElementById('cards'));
+  }}
+
   var IMG_NASA = 'data:image/png;base64,{img_kepler_b64}';
   var IMG_SIMU = 'data:image/png;base64,{img_terre_b64}';
 
@@ -416,16 +398,12 @@ if st.session_state.etape_actuelle == "Accueil":
       el = p.createElement('div');
       el.id = '__astro_blur_bg__';
       el.style.cssText = [
-        'position:fixed', 'inset:0', 'z-index:0',
-        'pointer-events:none',
-        'opacity:0',
-        'background-size:cover',
-        'background-position:center',
-        'filter:blur(3px)',
-        'transform:scale(1.05)',  /* évite les bords blancs dus au blur */
+        'position:fixed','inset:0','z-index:0',
+        'pointer-events:none','opacity:0',
+        'background-size:cover','background-position:center',
+        'filter:blur(3px)','transform:scale(1.05)',
         'transition:opacity 1.3s ease-in-out'
       ].join(';');
-      /* Insère juste avant le premier enfant de body pour être derrière tout */
       p.body.insertBefore(el, p.body.firstChild);
     }}
     return el;
@@ -437,23 +415,11 @@ if st.session_state.etape_actuelle == "Accueil":
     var img = which === 'nasa' ? IMG_NASA : IMG_SIMU;
     var app = getStApp();
     var bgDiv = getOrCreateBgDiv();
-
-    /* Annule tout timer de disparition en cours */
     if (_hideTimer) {{ clearTimeout(_hideTimer); _hideTimer = null; }}
-
-    /* 1. Coupe l'animation gradient et rend .stApp transparent */
-    if (app) {{
-      app.style.transition = 'none';
-      app.style.background = 'transparent';
-      app.style.animation = 'none';
-    }}
-
-    /* 2. Pose l'image SANS transition (opacité encore à 0) */
+    if (app) {{ app.style.transition='none'; app.style.background='transparent'; app.style.animation='none'; }}
     bgDiv.style.transition = 'none';
-    bgDiv.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.55)),url(' + img + ')';
+    bgDiv.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.55)),url('+img+')';
     bgDiv.style.opacity = '0';
-
-    /* 3. Double rAF : laisse le navigateur peindre l'image avant de lancer le fondu */
     requestAnimationFrame(function() {{
       requestAnimationFrame(function() {{
         bgDiv.style.transition = 'opacity 1.4s ease-in-out';
@@ -465,39 +431,57 @@ if st.session_state.etape_actuelle == "Accueil":
   function hideBg() {{
     var app = getStApp();
     var bgDiv = getOrCreateBgDiv();
-
-    /* Fondu de sortie */
     bgDiv.style.transition = 'opacity 1.4s ease-in-out';
     bgDiv.style.opacity = '0';
-
-    /* Restaure le gradient animé APRÈS la fin du fondu */
     _hideTimer = setTimeout(function() {{
       _hideTimer = null;
       if (app) {{
         app.style.transition = 'none';
         app.style.background = 'linear-gradient(-45deg,#000000,#0a1128,#1c3f60,#000000)';
         app.style.backgroundSize = '400% 400%';
-        app.style.animation = 'gradientBackground 15s ease infinite';
+        if (window.parent.innerWidth > 768) {{
+          app.style.animation = 'gradientBackground 15s ease infinite';
+        }}
       }}
     }}, 1400);
   }}
 
   function navigate(dest) {{
-    // Cherche et clique le bouton Streamlit caché correspondant dans le document parent
     var buttons = window.parent.document.querySelectorAll('button');
     var keyword = dest === 'nasa' ? 'nasa_hidden' : 'simu_hidden';
     for (var i = 0; i < buttons.length; i++) {{
-      if (buttons[i].innerText.trim() === keyword) {{
-        buttons[i].click();
-        return;
-      }}
+      if (buttons[i].innerText.trim() === keyword) {{ buttons[i].click(); return; }}
     }}
+  }}
+
+  function adjustHeight() {{
+    var body = document.body;
+    var h = body.getBoundingClientRect().height;
+    window.parent.postMessage({{type: 'streamlit:setFrameHeight', height: h}}, '*');
+    if (window.frameElement) window.frameElement.style.height = h + 'px';
+  }}
+  window.addEventListener('load', function() {{ setTimeout(adjustHeight, 80); }});
+  window.addEventListener('resize', adjustHeight);
+  if (window.ResizeObserver) {{
+    new ResizeObserver(adjustHeight).observe(document.body);
   }}
 </script>
 
+<p style="text-align:center;color:rgba(255,255,255,0.25);font-size:0.73em;
+          font-family:'Inter',sans-serif;margin-top:150px;letter-spacing:0.05em;">
+  AstroData Explorer &nbsp;&mdash;&nbsp; Donn&eacute;es NASA · Kepler &amp; TESS
+  &nbsp;&mdash;&nbsp; Moteur IA : Random Forest
+</p>
+
+<p style="text-align:center;color:rgba(255,255,255,0.25);font-size:0.80em;
+          font-family:'Inter',sans-serif;margin-top:20px;letter-spacing:0.07em;">
+  Par : Abondo Jean Jo&euml;l
+  <br>Matricule : 23V2214
+</p>  
+
 </body>
 </html>
-    """, height=280, scrolling=False)
+    """, height=560, scrolling=False)
 
 # =====================================================================
 # ÉTAPE 2 : PAGE DE SAISIE (Uniquement pour Simulation)
@@ -636,6 +620,21 @@ elif st.session_state.etape_actuelle == "Analyse":
         if st.button("Retourner à l'accueil", use_container_width=True):
             changer_etape("Accueil")
             st.rerun()
+
+        st.divider()
+        st.markdown("""
+            <div style="text-align:center; color:rgba(255,255,255,0.55);
+                        font-size:0.82em; font-family:'Inter',sans-serif;
+                        line-height:1.8; letter-spacing:0.04em;">
+                Données NASA · Kepler &amp; TESS<br>
+                Moteur IA : Random Forest<br>
+                <br>
+                <span style="color:rgba(255,255,255,0.35); font-size:0.92em;">
+                    Par : Abondo Jean Joël<br>
+                    Matricule : 23V2214
+                </span>
+            </div>
+        """, unsafe_allow_html=True)
 
     st.markdown('<div class="animated-title">🔭 AstroData Explorer Pro</div>', unsafe_allow_html=True)
 
