@@ -66,11 +66,35 @@ def verifier_coherence_planete(nom, masse, rayon, temp, periode, df_existant):
     
     return True, "Paramètres orbitaux validés !"
 
-def get_base64_image(image_path):
-    """Convertit une image locale en texte base64 pour l'injecter dans le CSS"""
+@st.cache_data(show_spinner=False)
+def get_base64_image(image_path, max_width=1280, quality=72):
+    """
+    Convertit une image locale en base64.
+    - Redimensionne si > max_width px (réduit le poids sans perte visuelle)
+    - Convertit en JPEG qualité 'quality' pour réduire la taille
+    - Résultat mis en cache : encodé une seule fois pour toute la session
+    """
     try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
+        from PIL import Image
+        import io
+        with Image.open(image_path) as img:
+            # Convertit RGBA→RGB si nécessaire (JPEG ne supporte pas la transparence)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            # Redimensionne si trop grande
+            if img.width > max_width:
+                ratio = max_width / img.width
+                img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=quality, optimize=True)
+            return base64.b64encode(buf.getvalue()).decode()
+    except ImportError:
+        # Pillow non disponible : fallback sans compression
+        try:
+            with open(image_path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+        except FileNotFoundError:
+            return ""
     except FileNotFoundError:
         st.warning(f"⚠️ Image introuvable : {image_path}")
         return ""
@@ -183,10 +207,28 @@ st.markdown("""
     <div id="top"></div>
 """, unsafe_allow_html=True)
 
-# --- INJECTION DES IMAGES LOCALES EN BACKGROUND ---
-# Remplace par les vrais noms de tes fichiers dans le dossier data
-img_kepler_b64 = get_base64_image("data/Earth.png") 
-img_terre_b64 = get_base64_image("data/Trappist-1e.png")
+# --- INJECTION DES IMAGES (une seule fois, mise en cache) ---
+img_kepler_b64 = get_base64_image("data/Earth.png")
+img_terre_b64  = get_base64_image("data/Trappist-1e.png")
+
+# Injecte les deux backgrounds dans le CSS global une seule fois.
+# Les pages Saisie/Analyse activent simplement la classe correspondante.
+st.markdown(f"""
+    <style>
+    .split-left  {{ background-image: url("data:image/jpeg;base64,{img_kepler_b64}"); }}
+    .split-right {{ background-image: url("data:image/jpeg;base64,{img_terre_b64}"); }}
+    .stApp.bg-kepler {{
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)),
+                    url("data:image/jpeg;base64,{img_kepler_b64}") !important;
+        background-size: cover !important; background-attachment: fixed !important;
+    }}
+    .stApp.bg-earth {{
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)),
+                    url("data:image/jpeg;base64,{img_terre_b64}") !important;
+        background-size: cover !important; background-attachment: fixed !important;
+    }}
+    </style>
+""", unsafe_allow_html=True)
 
 # --- CHARGEMENT DES DONNÉES ---
 @st.cache_data
@@ -199,16 +241,6 @@ def load_data():
     except: return None
 
 df_global = load_data()
-
-# --- SIDEBAR : uniquement sur la page Analyse ---
-if st.session_state.etape_actuelle != "Analyse":
-    # Cache complètement la sidebar sur Accueil et Saisie
-    st.markdown("""
-        <style>
-        [data-testid="stSidebar"] { display: none !important; }
-        [data-testid="collapsedControl"] { display: none !important; }
-        </style>
-    """, unsafe_allow_html=True)
 
 
 # =====================================================================
@@ -487,15 +519,11 @@ if st.session_state.etape_actuelle == "Accueil":
 # ÉTAPE 2 : PAGE DE SAISIE (Uniquement pour Simulation)
 # =====================================================================
 elif st.session_state.etape_actuelle == "Saisie":
-    # Remplace l'animation par l'image statique de la Terre pour tout le laboratoire
-    st.markdown(f"""
-        <style>
-        .stApp {{
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), url("data:image/jpeg;base64,{img_terre_b64}") !important;
-            background-size: cover !important;
-            background-attachment: fixed !important;
-        }}
-        </style>
+    # Active la classe bg-earth déjà définie dans le CSS global (pas de ré-injection base64)
+    st.markdown("""
+        <script>
+        document.querySelector('.stApp').classList.add('bg-earth');
+        </script>
     """, unsafe_allow_html=True)
     st.markdown('<div class="animated-title">🪐 LABORATOIRE DE CRÉATION</div>', unsafe_allow_html=True)
     st.markdown("Simulez vos propres exoplanètes et testez-les face aux lois de l'astrophysique.")
@@ -576,17 +604,12 @@ elif st.session_state.etape_actuelle == "Saisie":
 # ÉTAPE 3 : PAGE D'ANALYSE (Onglets Restaurés)
 # =====================================================================
 elif st.session_state.etape_actuelle == "Analyse":
-    # Sélectionne Kepler si on vient de la NASA, Terre si on vient de la Simulation
-    fond_actuel = img_kepler_b64 if st.session_state.choix_source == "NASA" else img_terre_b64
-    
+    # Active la classe de fond selon la source (pas de ré-injection base64)
+    bg_class = "bg-kepler" if st.session_state.choix_source == "NASA" else "bg-earth"
     st.markdown(f"""
-        <style>
-        .stApp {{
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), url("data:image/jpeg;base64,{fond_actuel}") !important;
-            background-size: cover !important;
-            background-attachment: fixed !important;
-        }}
-        </style>
+        <script>
+        document.querySelector('.stApp').classList.add('{bg_class}');
+        </script>
     """, unsafe_allow_html=True)
 
     # --- PRÉPARATION DU DATAFRAME FILTRÉ ---
@@ -620,21 +643,6 @@ elif st.session_state.etape_actuelle == "Analyse":
         if st.button("Retourner à l'accueil", use_container_width=True):
             changer_etape("Accueil")
             st.rerun()
-
-        st.divider()
-        st.markdown("""
-            <div style="text-align:center; color:rgba(255,255,255,0.55);
-                        font-size:0.82em; font-family:'Inter',sans-serif;
-                        line-height:1.8; letter-spacing:0.04em;">
-                Données NASA · Kepler &amp; TESS<br>
-                Moteur IA : Random Forest<br>
-                <br>
-                <span style="color:rgba(255,255,255,0.35); font-size:0.92em;">
-                    Par : Abondo Jean Joël<br>
-                    Matricule : 23V2214
-                </span>
-            </div>
-        """, unsafe_allow_html=True)
 
     st.markdown('<div class="animated-title">🔭 AstroData Explorer Pro</div>', unsafe_allow_html=True)
 
