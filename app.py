@@ -644,6 +644,21 @@ elif st.session_state.etape_actuelle == "Analyse":
             changer_etape("Accueil")
             st.rerun()
 
+        st.divider()
+        st.markdown("""
+            <div style="text-align:center; color:rgba(255,255,255,0.55);
+                        font-size:0.82em; font-family:'Inter',sans-serif;
+                        line-height:1.8; letter-spacing:0.04em;">
+                Données NASA · Kepler &amp; TESS<br>
+                Moteur IA : Random Forest<br>
+                <br>
+                <span style="color:rgba(255,255,255,0.35); font-size:0.92em;">
+                    Par : Abondo Jean Joël<br>
+                    Matricule : 23V2214
+                </span>
+            </div>
+        """, unsafe_allow_html=True)
+
     st.markdown('<div class="animated-title">🔭 AstroData Explorer Pro</div>', unsafe_allow_html=True)
 
     if df_global is not None and len(df) > 0:
