@@ -94,6 +94,15 @@ def get_base64_image(image_path, max_width=1280, quality=72):
         st.warning(f"⚠️ Image introuvable : {image_path}")
         return ""
 
+def get_svg_base64(svg_path):
+    """Retourne une data-URL base64 pour un SVG local."""
+    try:
+        with open(svg_path, "rb") as f:
+            return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode()
+    except FileNotFoundError:
+        st.warning(f"⚠️ SVG introuvable : {svg_path}")
+        return ""
+
 # Liens SVG Bootstrap (Restaurés)
 LOGOS = {
     "dashboard": "https://icons.getbootstrap.com/assets/icons/globe-americas.svg",
@@ -205,6 +214,8 @@ st.markdown("""
 # --- INJECTION DES IMAGES (une seule fois, mise en cache) ---
 img_kepler_b64 = get_base64_image("data/Earth.png")
 img_terre_b64  = get_base64_image("data/Trappist-1e.png")
+svg_saturne_b64 = get_svg_base64("data/genetic-data-svgrepo-com.svg")
+svg_rocket_b64 = get_svg_base64("data/rocket-svgrepo-com.svg")
 
 # Classes bg activées par JS selon la page — jamais ré-injectées ensuite.
 
@@ -367,18 +378,14 @@ if st.session_state.etape_actuelle == "Accueil":
          width="110" style="display:block;" loading="lazy"/>
     <h3>Base R&eacute;elle NASA</h3>
     <p>Analysez les v&eacute;ritables exoplan&egrave;tes d&eacute;couvertes par nos t&eacute;lescopes (Missions Kepler et TESS).</p>
-    <button class="card-btn" onclick="navigate('nasa')">
-      <img src="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/1F680.svg"
-           width="20" style="vertical-align:middle;margin-right:6px;" loading="lazy"/>
-      Lancer l&rsquo;exploration
-    </button>
+    <button class="card-btn" onclick="navigate('nasa')">Lancer l&rsquo;exploration</button>
   </div>
 
   <div class="rubrique-card card-simu"
        onmouseenter="showBg('simu')"
        onmouseleave="hideBg()">
-    <img src="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/1FA90.svg"
-         width="60" style="display:block;" loading="lazy"/>
+    <img src="{svg_saturne_b64}"
+         width="50" style="display:block; margin: 0 auto 5px auto;" loading="lazy"/>
     <h3>Laboratoire (Simulation)</h3>
     <p>Partez d&rsquo;un &eacute;chantillon r&eacute;duit, cr&eacute;ez vos propres plan&egrave;tes et pi&eacute;gez l&rsquo;IA.</p>
     <button class="card-btn" onclick="navigate('simu')">Cr&eacute;er des mondes</button>
@@ -833,7 +840,12 @@ elif st.session_state.etape_actuelle == "Analyse":
                     r = c2.slider("Rayon", 0.1, 5.0, 1.0, key="slider_radius_ml")
                     t = c3.number_input("Température (K)", 2000, 10000, 5700, key="input_temp_ml")
 
-                    if st.button("🚀 LANCER L'ANALYSE", use_container_width=True):
+                    st.markdown(
+                        f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">'
+                        f'<img src="{svg_rocket_b64}" width="30" height="30" style="display:block;" alt="Lancer l\'analyse"/>',
+                        unsafe_allow_html=True
+                    )
+                    if st.button("LANCER L'ANALYSE", use_container_width=True):
                         # Calcul du pourcentage de certitude (Probabilité)
                         proba = model_sup.predict_proba([[m, r, t]])[0]
                         if model_sup.predict([[m, r, t]])[0] == 1:
