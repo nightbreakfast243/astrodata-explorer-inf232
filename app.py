@@ -70,18 +70,14 @@ def verifier_coherence_planete(nom, masse, rayon, temp, periode, df_existant):
 def get_base64_image(image_path, max_width=1280, quality=72):
     """
     Convertit une image locale en base64.
-    - Redimensionne si > max_width px (réduit le poids sans perte visuelle)
-    - Convertit en JPEG qualité 'quality' pour réduire la taille
-    - Résultat mis en cache : encodé une seule fois pour toute la session
+    Mise en cache — encodée une seule fois pour toute la session serveur.
     """
     try:
         from PIL import Image
         import io
         with Image.open(image_path) as img:
-            # Convertit RGBA→RGB si nécessaire (JPEG ne supporte pas la transparence)
             if img.mode in ("RGBA", "P"):
                 img = img.convert("RGB")
-            # Redimensionne si trop grande
             if img.width > max_width:
                 ratio = max_width / img.width
                 img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
@@ -89,7 +85,6 @@ def get_base64_image(image_path, max_width=1280, quality=72):
             img.save(buf, format="JPEG", quality=quality, optimize=True)
             return base64.b64encode(buf.getvalue()).decode()
     except ImportError:
-        # Pillow non disponible : fallback sans compression
         try:
             with open(image_path, "rb") as f:
                 return base64.b64encode(f.read()).decode()
@@ -211,21 +206,18 @@ st.markdown("""
 img_kepler_b64 = get_base64_image("data/Earth.png")
 img_terre_b64  = get_base64_image("data/Trappist-1e.png")
 
-# Injecte les deux backgrounds dans le CSS global une seule fois.
-# Les pages Saisie/Analyse activent simplement la classe correspondante.
+# Classes bg activées par JS selon la page — jamais ré-injectées ensuite.
 st.markdown(f"""
     <style>
-    .split-left  {{ background-image: url("data:image/jpeg;base64,{img_kepler_b64}"); }}
-    .split-right {{ background-image: url("data:image/jpeg;base64,{img_terre_b64}"); }}
     .stApp.bg-kepler {{
-        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)),
-                    url("data:image/jpeg;base64,{img_kepler_b64}") !important;
-        background-size: cover !important; background-attachment: fixed !important;
+        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
+                    url("data:image/jpeg;base64,{img_kepler_b64}") center/cover fixed !important;
+        animation: none !important;
     }}
     .stApp.bg-earth {{
-        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)),
-                    url("data:image/jpeg;base64,{img_terre_b64}") !important;
-        background-size: cover !important; background-attachment: fixed !important;
+        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
+                    url("data:image/jpeg;base64,{img_terre_b64}") center/cover fixed !important;
+        animation: none !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -242,6 +234,15 @@ def load_data():
 
 df_global = load_data()
 
+
+# Masque la sidebar sur Accueil et Saisie
+if st.session_state.etape_actuelle != "Analyse":
+    st.markdown("""
+        <style>
+        [data-testid="stSidebar"]      { display: none !important; }
+        [data-testid="collapsedControl"]{ display: none !important; }
+        </style>
+    """, unsafe_allow_html=True)
 
 # =====================================================================
 # ÉTAPE 1 : PAGE D'ACCUEIL
