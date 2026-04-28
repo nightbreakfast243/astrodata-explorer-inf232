@@ -507,7 +507,7 @@ if st.session_state.etape_actuelle == "Accueil":
 
 <p style="text-align:center;color:rgba(255,255,255,0.25);font-size:0.80em;
           font-family:'Inter',sans-serif;margin-top:20px;letter-spacing:0.07em;">
-  Par : Abondo Jean Jo&euml;l
+  Par : Abondo Jean Joël
   <br>Matricule : 23V2214
 </p>  
 
@@ -608,7 +608,15 @@ elif st.session_state.etape_actuelle == "Analyse":
     bg_class = "bg-kepler" if st.session_state.choix_source == "NASA" else "bg-earth"
     st.markdown(f"""
         <script>
-        document.querySelector('.stApp').classList.add('{bg_class}');
+        (function setBg() {{
+            var app = document.querySelector('.stApp');
+            if (app) {{
+                app.classList.remove('bg-kepler', 'bg-earth');
+                app.classList.add('{bg_class}');
+            }} else {{
+                setTimeout(setBg, 80);
+            }}
+        }})();
         </script>
     """, unsafe_allow_html=True)
 
