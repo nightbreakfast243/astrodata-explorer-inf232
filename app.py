@@ -207,20 +207,6 @@ img_kepler_b64 = get_base64_image("data/Earth.png")
 img_terre_b64  = get_base64_image("data/Trappist-1e.png")
 
 # Classes bg activées par JS selon la page — jamais ré-injectées ensuite.
-st.markdown(f"""
-    <style>
-    .stApp.bg-kepler {{
-        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
-                    url("data:image/jpeg;base64,{img_kepler_b64}") center/cover fixed !important;
-        animation: none !important;
-    }}
-    .stApp.bg-earth {{
-        background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
-                    url("data:image/jpeg;base64,{img_terre_b64}") center/cover fixed !important;
-        animation: none !important;
-    }}
-    </style>
-""", unsafe_allow_html=True)
 
 # --- CHARGEMENT DES DONNÉES ---
 @st.cache_data
@@ -520,11 +506,14 @@ if st.session_state.etape_actuelle == "Accueil":
 # ÉTAPE 2 : PAGE DE SAISIE (Uniquement pour Simulation)
 # =====================================================================
 elif st.session_state.etape_actuelle == "Saisie":
-    # Active la classe bg-earth déjà définie dans le CSS global (pas de ré-injection base64)
-    st.markdown("""
-        <script>
-        document.querySelector('.stApp').classList.add('bg-earth');
-        </script>
+    st.markdown(f"""
+        <style>
+        .stApp {{
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
+                        url("data:image/jpeg;base64,{img_terre_b64}") center/cover fixed !important;
+            animation: none !important;
+        }}
+        </style>
     """, unsafe_allow_html=True)
     st.markdown('<div class="animated-title">🪐 LABORATOIRE DE CRÉATION</div>', unsafe_allow_html=True)
     st.markdown("Simulez vos propres exoplanètes et testez-les face aux lois de l'astrophysique.")
@@ -605,20 +594,15 @@ elif st.session_state.etape_actuelle == "Saisie":
 # ÉTAPE 3 : PAGE D'ANALYSE (Onglets Restaurés)
 # =====================================================================
 elif st.session_state.etape_actuelle == "Analyse":
-    # Active la classe de fond selon la source (pas de ré-injection base64)
-    bg_class = "bg-kepler" if st.session_state.choix_source == "NASA" else "bg-earth"
+    fond_b64 = img_kepler_b64 if st.session_state.choix_source == "NASA" else img_terre_b64
     st.markdown(f"""
-        <script>
-        (function setBg() {{
-            var app = document.querySelector('.stApp');
-            if (app) {{
-                app.classList.remove('bg-kepler', 'bg-earth');
-                app.classList.add('{bg_class}');
-            }} else {{
-                setTimeout(setBg, 80);
-            }}
-        }})();
-        </script>
+        <style>
+        .stApp {{
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
+                        url("data:image/jpeg;base64,{fond_b64}") center/cover fixed !important;
+            animation: none !important;
+        }}
+        </style>
     """, unsafe_allow_html=True)
 
     # --- PRÉPARATION DU DATAFRAME FILTRÉ ---
