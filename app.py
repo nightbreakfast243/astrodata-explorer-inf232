@@ -319,11 +319,13 @@ if st.session_state.etape_actuelle == "Accueil":
     font-family: 'Orbitron', 'Inter', sans-serif;
     font-size: 1.1em;
     font-weight: 700;
+    text-align: center;
   }}
   .rubrique-card p {{
     color: #b0b8c8;
     font-size: 0.92em;
     line-height: 1.5;
+    text-align: center;
   }}
   .card-btn {{
     display: block;
@@ -357,8 +359,14 @@ if st.session_state.etape_actuelle == "Accueil":
       padding: 20px 16px;
       gap: 8px;
     }}
-    .rubrique-card h3 {{ font-size: 1em; }}
-    .rubrique-card p  {{ font-size: 0.85em; }}
+    .rubrique-card h3 {{ 
+        font-size: 1em;
+        text-align: center;
+        }}
+    .rubrique-card p  {{ 
+        font-size: 0.85em; 
+        text-align: center;
+    }}
     .rubrique-card img {{ width: 80px !important; }}
     .card-btn {{
       width: 80%;
@@ -375,7 +383,7 @@ if st.session_state.etape_actuelle == "Accueil":
        onmouseenter="showBg('nasa')"
        onmouseleave="hideBg()">
     <img src="https://www.nasa.gov/wp-content/uploads/2023/03/nasa-logo-web-rgb.png"
-         width="110" style="display:block;" loading="lazy"/>
+         width="110" style="display:block; margin: 0 auto 5px auto;" loading="lazy"/>
     <h3>Base R&eacute;elle NASA</h3>
     <p>Analysez les v&eacute;ritables exoplan&egrave;tes d&eacute;couvertes par nos t&eacute;lescopes (Missions Kepler et TESS).</p>
     <button class="card-btn" onclick="navigate('nasa')">Lancer l&rsquo;exploration</button>
@@ -499,13 +507,13 @@ if st.session_state.etape_actuelle == "Accueil":
 </script>
 
 <p style="text-align:center;color:rgba(255,255,255,0.25);font-size:0.73em;
-          font-family:'Inter',sans-serif;margin-top:150px;letter-spacing:0.05em;">
+          font-family:'Inter',sans-serif;margin-top:120px;letter-spacing:0.05em;">
   AstroData Explorer &nbsp;&mdash;&nbsp; Donn&eacute;es NASA · Kepler &amp; TESS
   &nbsp;&mdash;&nbsp; Moteur IA : Random Forest
 </p>
 
 <p style="text-align:center;color:rgba(255,255,255,0.25);font-size:0.80em;
-          font-family:'Inter',sans-serif;margin-top:20px;letter-spacing:0.07em;">
+          font-family:'Inter',sans-serif;margin-top:15px;letter-spacing:0.07em;">
   Par : Abondo Jean Joël
   <br>Matricule : 23V2214
 </p>  
