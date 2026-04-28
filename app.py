@@ -367,13 +367,18 @@ if st.session_state.etape_actuelle == "Accueil":
          width="110" style="display:block;" loading="lazy"/>
     <h3>Base R&eacute;elle NASA</h3>
     <p>Analysez les v&eacute;ritables exoplan&egrave;tes d&eacute;couvertes par nos t&eacute;lescopes (Missions Kepler et TESS).</p>
-    <button class="card-btn" onclick="navigate('nasa')">Lancer l&rsquo;exploration</button>
+    <button class="card-btn" onclick="navigate('nasa')">
+      <img src="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/1F680.svg"
+           width="20" style="vertical-align:middle;margin-right:6px;" loading="lazy"/>
+      Lancer l&rsquo;exploration
+    </button>
   </div>
 
   <div class="rubrique-card card-simu"
        onmouseenter="showBg('simu')"
        onmouseleave="hideBg()">
-    <div style="font-size:2.6em;">&#129680;</div>
+    <img src="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/1FA90.svg"
+         width="60" style="display:block;" loading="lazy"/>
     <h3>Laboratoire (Simulation)</h3>
     <p>Partez d&rsquo;un &eacute;chantillon r&eacute;duit, cr&eacute;ez vos propres plan&egrave;tes et pi&eacute;gez l&rsquo;IA.</p>
     <button class="card-btn" onclick="navigate('simu')">Cr&eacute;er des mondes</button>
