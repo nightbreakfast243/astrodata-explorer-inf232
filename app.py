@@ -646,7 +646,7 @@ elif st.session_state.etape_actuelle == "Analyse":
 
     # --- SIDEBAR (Restaurée pour la vue Analyse) ---
     with st.sidebar:
-        st.markdown('<img src="https://www.nasa.gov/wp-content/uploads/2023/03/nasa-logo-web-rgb.png" width="100">', unsafe_allow_html=True)
+        st.markdown('<img src="https://www.nasa.gov/wp-content/uploads/2023/03/nasa-logo-web-rgb.png" width="100" loading="lazy">', unsafe_allow_html=True)
         st.markdown("### Contexte")
         st.write("Analyse des données issues des missions Kepler et TESS pour l'identification de mondes habitables.")
         
