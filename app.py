@@ -597,7 +597,8 @@ elif st.session_state.etape_actuelle == "Saisie":
     with col_recap:
         st.subheader("Vos créations actuelles")
         if len(st.session_state.user_planets) == 0:
-            st.info("💡 Votre flotte est vide. Utilisez le créateur à gauche pour enregistrer votre première planète.")
+            st.info("💡 Votre flotte est vide. Utilisez le **Laboratoire de création** pour enregistrer votre première planète et l'ajouter à l'univers (possédant actuellement **20 exoplanètes**).")
+            st.info("💡 **Astuce :** Si vous passez à l'analyse sans créer d'exoplanètes, un échantillon de **20 exoplanètes** seront mises à votre disposition.")
         else:
             st.dataframe(st.session_state.user_planets, use_container_width=True, height=400)
             
