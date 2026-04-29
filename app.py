@@ -818,9 +818,9 @@ elif st.session_state.etape_actuelle == "Analyse":
                 
                 **Les seuils d'habitabilité (Critères de la zone Goldilocks) :**
                 Pour qu'une planète soit considérée comme candidate à la vie dans notre base de données d'entraînement, elle doit respecter *toutes* ces conditions physiques :
-                * **Masse :Coefficient du produit par la masse de la Terre.
-                * **Rayon : Coefficient du produit par le rayon de la Terre (planètes rocheuses).
-                * **Température de l'étoile hôte :(Étoiles similaires à notre Soleil).
+                * ** Masse **:Coefficient du produit par la masse de la Terre.
+                * ** Rayon **: Coefficient du produit par le rayon de la Terre (planètes rocheuses).
+                * ** Température de l'étoile hôte **:(Étoiles similaires à notre Soleil).
                 
                 **Comment tester ?**
                 Modifiez les curseurs ci-dessous pour créer une planète de toutes pièces. L'IA comparera ces valeurs aux modèles appris et vous donnera son verdict instantanément.
