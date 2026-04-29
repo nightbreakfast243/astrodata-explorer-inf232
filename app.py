@@ -712,7 +712,7 @@ elif st.session_state.etape_actuelle == "Analyse":
             st.markdown("""
             **AstroData Explorer Pro** est une application interactive d'analyse de données développée dans le cadre de l'UE **INF232 (Statistique et Analyse des Données)**. Son objectif est d'appliquer concrètement les théories statistiques et les modèles de *Machine Learning* sur des jeux de données complexes et passionnants.
 
-            **Source des données : L'API NASA Exoplanet Archive** Les données physiques analysées dans ce projet proviennent en grande partie de la véritable API publique de la **NASA Exoplanet Archive**. 
+            **Source des données : L'API NASA Exoplanet Archive** Les données physiques analysées dans ce projet proviennent entièrement de la véritable API publique de la **NASA Exoplanet Archive**. 
             """)
 
             display_scroll_to_top()
